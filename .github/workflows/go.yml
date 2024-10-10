@@ -33,7 +33,9 @@ jobs:
       run: |
        ls
     - name: Test
-      run: go test -v ./main.go   
+      run: | 
+        cd maker/golang
+        go test -v ./main.go   
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
       with:
@@ -84,7 +86,9 @@ jobs:
       run: |
        dir
     - name: Test
-      run: go test -v ./main.go  
+      run: | 
+        cd maker/golang
+        go test -v ./main.go  
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
       with:
