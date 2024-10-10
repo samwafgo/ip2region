@@ -26,9 +26,9 @@ jobs:
       run: |
        ls
     - name: Build 
-      run:
-        cd maker/golang 
-        go build -v -o xdb_maker.exe ./...
+      run: |
+        cd maker/golang
+        go build -v -o xdb_maker ./...
     - name: After Build Dictory
       run: |
        ls
@@ -77,7 +77,7 @@ jobs:
       run: |
        ls
     - name: Build
-      run: 
+      run: | 
           cd maker/golang 
           go build -v -o xdb_maker.exe ./...
     - name: After Build Dictory
