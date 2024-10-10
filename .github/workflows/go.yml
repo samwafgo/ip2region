@@ -40,7 +40,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: xdb_maker
-        path: xdb_maker
+        path: maker/xdb_maker
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1.1.4
@@ -63,7 +63,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: xdb_maker
+        asset_path: maker/xdb_maker
         asset_name: xdb_maker
         asset_content_type: application/octet-stream 
       
@@ -93,7 +93,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: xdb_maker.exe
-        path: xdb_maker.exe
+        path: maker/xdb_maker.exe
     - name: echo linux
       run: |
        echo "${{ needs.linuxbuild.outputs.release_out_upload_url }}"    
@@ -103,7 +103,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.linuxbuild.outputs.release_out_upload_url }}
-        asset_path: xdb_maker.exe
+        asset_path: maker/xdb_maker.exe
         asset_name: xdb_maker.exe
         asset_content_type: application/octet-stream
     needs: linuxbuild  
