@@ -1,6 +1,3 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
 name: Go
 
 on:
@@ -18,29 +15,59 @@ jobs:
       release_out_upload_url: ${{ steps.set_upload_url.outputs.upload_url }}
     steps:
     - uses: actions/checkout@v4
+    
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
         go-version: '1.20'
-    - name: Before Build Dictory
+        
+    - name: Before Build Directory
       run: |
-       ls
-    - name: Build 
+        ls
+    
+    # Build xdb_maker
+    - name: Build xdb_maker
       run: |
         cd maker/golang
         go build -v -o xdb_maker ./main.go
-    - name: After Build Dictory
+    
+    # Build xdb_searcher
+    - name: Build xdb_searcher
       run: |
-       ls
-    - name: Test
+        cd binding/golang
+        go build -v -o xdb_searcher ./main.go
+
+    - name: After Build Directory
+      run: |
+        ls maker/golang
+        ls binding/golang
+    
+    # Test xdb_maker
+    - name: Test xdb_maker
       run: | 
         cd maker/golang
         go test -v ./main.go   
-    - name: 'Upload Artifact'
+    
+    # Test xdb_searcher
+    - name: Test xdb_searcher
+      run: | 
+        cd binding/golang
+        go test -v ./main.go
+    
+    # Upload Artifact for xdb_maker
+    - name: 'Upload xdb_maker Artifact'
       uses: actions/upload-artifact@v4
       with:
         name: xdb_maker
         path: maker/golang/xdb_maker
+    
+    # Upload Artifact for xdb_searcher
+    - name: 'Upload xdb_searcher Artifact'
+      uses: actions/upload-artifact@v4
+      with:
+        name: xdb_searcher
+        path: binding/golang/xdb_searcher
+    
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1.1.4
@@ -51,13 +78,17 @@ jobs:
         release_name: v1
         draft: false
         prerelease: false
-    - name: set output
+    
+    - name: Set output
       id: set_upload_url
       run: echo "upload_url=${{steps.create_release.outputs.upload_url}}" >> $GITHUB_OUTPUT  
-    - name: echo vars
+    
+    - name: Echo vars
       run: |
-       echo "${{steps.create_release.outputs.upload_url}}"    
-    - name: Upload Release Assets
+        echo "${{steps.create_release.outputs.upload_url}}"    
+    
+    # Upload Release Assets for xdb_maker
+    - name: Upload xdb_maker Release Assets
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,38 +97,81 @@ jobs:
         asset_path: maker/golang/xdb_maker
         asset_name: xdb_maker
         asset_content_type: application/octet-stream 
-      
+    
+    # Upload Release Assets for xdb_searcher
+    - name: Upload xdb_searcher Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: binding/golang/xdb_searcher
+        asset_name: xdb_searcher
+        asset_content_type: application/octet-stream 
+  
   windowsbuild:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
+    
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
         go-version: '1.20'
-    - name: Before Build Dictory
+        
+    - name: Before Build Directory
       run: |
-       ls
-    - name: Build
+        dir
+    
+    # Build xdb_maker for Windows
+    - name: Build xdb_maker
       run: | 
-          cd maker/golang 
-          go build -v -o xdb_maker.exe ./main.go
-    - name: After Build Dictory
+        cd maker/golang 
+        go build -v -o xdb_maker.exe ./main.go
+    
+    # Build xdb_searcher for Windows
+    - name: Build xdb_searcher
+      run: | 
+        cd binding/golang
+        go build -v -o xdb_searcher.exe ./main.go
+
+    - name: After Build Directory
       run: |
-       dir
-    - name: Test
+        dir maker/golang
+        dir binding/golang
+    
+    # Test xdb_maker
+    - name: Test xdb_maker
       run: | 
         cd maker/golang
         go test -v ./main.go  
-    - name: 'Upload Artifact'
+    
+    # Test xdb_searcher
+    - name: Test xdb_searcher
+      run: | 
+        cd binding/golang
+        go test -v ./main.go
+    
+    # Upload Artifact for xdb_maker
+    - name: 'Upload xdb_maker.exe Artifact'
       uses: actions/upload-artifact@v4
       with:
         name: xdb_maker.exe
         path: maker/golang/xdb_maker.exe
-    - name: echo linux
+    
+    # Upload Artifact for xdb_searcher
+    - name: 'Upload xdb_searcher.exe Artifact'
+      uses: actions/upload-artifact@v4
+      with:
+        name: xdb_searcher.exe
+        path: binding/golang/xdb_searcher.exe
+    
+    - name: Echo linux
       run: |
-       echo "${{ needs.linuxbuild.outputs.release_out_upload_url }}"    
-    - name: Upload Release Assets
+        echo "${{ needs.linuxbuild.outputs.release_out_upload_url }}"    
+    
+    # Upload Release Assets for xdb_maker
+    - name: Upload xdb_maker.exe Release Assets
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -106,4 +180,15 @@ jobs:
         asset_path: maker/golang/xdb_maker.exe
         asset_name: xdb_maker.exe
         asset_content_type: application/octet-stream
-    needs: linuxbuild  
+    
+    # Upload Release Assets for xdb_searcher
+    - name: Upload xdb_searcher.exe Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.linuxbuild.outputs.release_out_upload_url }}
+        asset_path: binding/golang/xdb_searcher.exe
+        asset_name: xdb_searcher.exe
+        asset_content_type: application/octet-stream
+    needs: linuxbuild
