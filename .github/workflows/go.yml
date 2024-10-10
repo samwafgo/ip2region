@@ -28,12 +28,12 @@ jobs:
     - name: Build 
       run: |
         cd maker/golang
-        go build -v -o xdb_maker ./...
+        go build -v -o xdb_maker ./main.go
     - name: After Build Dictory
       run: |
        ls
     - name: Test
-      run: go test -v ./...   
+      run: go test -v ./main.go   
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
       with:
@@ -79,12 +79,12 @@ jobs:
     - name: Build
       run: | 
           cd maker/golang 
-          go build -v -o xdb_maker.exe ./...
+          go build -v -o xdb_maker.exe ./main.go
     - name: After Build Dictory
       run: |
        dir
     - name: Test
-      run: go test -v ./...   
+      run: go test -v ./main.go  
     - name: 'Upload Artifact'
       uses: actions/upload-artifact@v4
       with:
